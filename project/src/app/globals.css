@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 248 246 240;
+    --foreground: 24 24 27;
+  }
+
+  body {
+    background-color: #F8F6F0;
+    color: #18181B;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1EDE2;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D5C799;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FF4500;
+}
+
+/* Utility to hide scrollbar in category bar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Scroll-reveal & decorative motion ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1.5deg); }
+}
+
+@keyframes shimmerSweep {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+@keyframes gentlePulseGlow {
+  0%, 100% { box-shadow: 0 4px 20px -2px rgba(255, 69, 0, 0.25); }
+  50% { box-shadow: 0 8px 30px -2px rgba(255, 69, 0, 0.45); }
+}
+
+/* Reveal-on-scroll: starts hidden, .in-view triggers the animation once */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-on-scroll.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animate-float-slow {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+.animate-pop-in {
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-glow-pulse {
+  animation: gentlePulseGlow 2.4s ease-in-out infinite;
+}
+
+.animate-whatsapp-glow {
+  animation: whatsappGlow 2.2s ease-out infinite;
+}
+
+@keyframes whatsappGlow {
+  0%, 100% { transform: scale(0.96); opacity: 0.45; }
+  50% { transform: scale(1.14); opacity: 0; }
+}
+
+/* ── Device-safe-area helpers ──
+   Keeps fixed/floating UI (WhatsApp bubble, mobile drawers) clear of notches,
+   rounded corners, and the home-indicator bar on phones/tablets that report
+   safe-area insets. Falls back to 0px on devices that don't support it. */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Large / TV-class screens: keep line lengths and layout readable instead of
+   letting content stretch edge-to-edge on very wide displays. */
+@media (min-width: 1920px) {
+  .tv-container {
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .animate-float-slow,
+  .animate-glow-pulse,
+  .animate-whatsapp-glow,
+  .animate-bounce,
+  .animate-pulse {
+    animation: none !important;
+  }
+}
