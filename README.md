@@ -194,6 +194,6 @@ This project is privately owned by **Pizzious**. All rights reserved © 2026.
 
 <div align="center">
 
-Made with ❤️ and 🍕 for **Pizzious**
+Made By  Saad Ullah ❤️ and 🍕 for **Pizzious**
 
 </div>
