@@ -153,6 +153,29 @@ Visit **`http://localhost:3000`** for the storefront, and **`http://localhost:30
 
 ---
 
+## 📸 Preview
+
+<div align="center">
+
+### 🏠 Homepage
+<img width="1907" height="900" alt="Pizzious homepage" src="REPLACE_WITH_HOMEPAGE_IMAGE_URL" />
+
+### 🍕 Menu & Categories
+<img width="1907" height="900" alt="Pizzious menu page" src="REPLACE_WITH_MENU_IMAGE_URL" />
+
+### 🛒 Cart & Checkout
+<img width="1907" height="900" alt="Pizzious cart drawer" src="REPLACE_WITH_CART_IMAGE_URL" />
+<img width="1907" height="900" alt="Pizzious checkout modal" src="REPLACE_WITH_CHECKOUT_IMAGE_URL" />
+
+### 🔐 Admin Dashboard
+<img width="1907" height="900" alt="Pizzious admin dashboard overview" src="REPLACE_WITH_ADMIN_OVERVIEW_IMAGE_URL" />
+<img width="1907" height="900" alt="Pizzious admin orders management" src="REPLACE_WITH_ADMIN_ORDERS_IMAGE_URL" />
+<img width="1907" height="900" alt="Pizzious admin item management" src="REPLACE_WITH_ADMIN_ITEMS_IMAGE_URL" />
+
+</div>
+
+---
+
 ## 📄 License
 
 This project is privately owned by **Pizzious**. All rights reserved © 2026.
