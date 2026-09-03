@@ -18,8 +18,9 @@ import {
 import { ProductCard } from '@/components/ProductCard';
 import { PizziousLogo } from '@/components/PizziousLogo';
 import { FloatingWhatsApp } from '@/components/FloatingWhatsApp';
+import { Footer } from '@/components/Footer';
 import { useCart } from '@/context/CartContext';
-import { MenuItem } from '@/lib/types';
+import { MenuItem, StoreSettings } from '@/lib/types';
 import { formatCurrency } from '@/lib/utils';
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=1000&auto=format&fit=crop&q=80';
@@ -30,6 +31,7 @@ function ProductDetailContent() {
   const { addItem } = useCart();
   const [item, setItem] = useState<MenuItem | null>(null);
   const [relatedItems, setRelatedItems] = useState<MenuItem[]>([]);
+  const [settings, setSettings] = useState<StoreSettings | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -40,9 +42,16 @@ function ProductDetailContent() {
     async function loadProduct() {
       try {
         setLoading(true);
-        const response = await fetch('/api/menu');
+        const [response, settingsResponse] = await Promise.all([
+          fetch('/api/menu'),
+          fetch('/api/settings'),
+        ]);
         if (!response.ok) throw new Error('Failed to load product');
         const data = await response.json();
+        if (settingsResponse.ok) {
+          const settingsData = await settingsResponse.json();
+          setSettings(settingsData.settings || null);
+        }
         const product = (data.items || []).find((menuItem: MenuItem) => menuItem.id === Number(params.id));
 
         if (!product) {
@@ -208,6 +217,7 @@ function ProductDetailContent() {
         )}
       </main>
 
+      <Footer settings={settings} />
       <FloatingWhatsApp />
     </div>
   );
