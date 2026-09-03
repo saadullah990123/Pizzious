@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { verifyPassword, signSession, SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS } from '@/lib/auth';
+import { verifyPassword, signSession, SESSION_COOKIE_NAME } from '@/lib/auth';
 
 // ── In-memory brute-force protection ──────────────────────────────────────
 // Keyed by client IP + attempted email. This is process-local (resets on
@@ -99,14 +99,14 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Set secure httpOnly cookie
+    // A session cookie is intentionally used here so closing the browser ends
+    // the browser's authentication session.
     response.cookies.set({
       name: SESSION_COOKIE_NAME,
       value: token,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: SESSION_MAX_AGE_SECONDS,
       path: '/',
     });
 

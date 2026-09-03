@@ -19,6 +19,9 @@ import {
   UserCog,
 } from 'lucide-react';
 
+const INACTIVITY_TIMEOUT_MS = 20 * 60 * 1000;
+const ADMIN_TAB_SESSION_KEY = 'pizzious_admin_tab_session';
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -36,6 +39,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     async function checkSession() {
       try {
+        if (sessionStorage.getItem(ADMIN_TAB_SESSION_KEY) !== 'active') {
+          await fetch('/api/auth/logout', { method: 'POST' });
+          router.replace('/admin/login');
+          return;
+        }
+
         const res = await fetch('/api/auth/me');
         if (!res.ok) {
           router.push('/admin/login');
@@ -57,12 +66,49 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     checkSession();
   }, [pathname, isLoginPage, router]);
 
+  useEffect(() => {
+    if (isLoginPage || !adminUser) return;
+
+    let timeoutId: ReturnType<typeof setTimeout>;
+    let logoutStarted = false;
+
+    const expireSession = async () => {
+      if (logoutStarted) return;
+      logoutStarted = true;
+
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      } finally {
+        sessionStorage.removeItem(ADMIN_TAB_SESSION_KEY);
+        setAdminUser(null);
+        router.replace('/admin/login?reason=inactivity');
+        router.refresh();
+      }
+    };
+
+    const resetTimeout = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(expireSession, INACTIVITY_TIMEOUT_MS);
+    };
+
+    const activityEvents = ['mousemove', 'click', 'keydown', 'touchstart'];
+    activityEvents.forEach((eventName) => window.addEventListener(eventName, resetTimeout));
+    resetTimeout();
+
+    return () => {
+      clearTimeout(timeoutId);
+      activityEvents.forEach((eventName) => window.removeEventListener(eventName, resetTimeout));
+    };
+  }, [adminUser, isLoginPage, router]);
+
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
+      sessionStorage.removeItem(ADMIN_TAB_SESSION_KEY);
       router.push('/admin/login');
       router.refresh();
     } catch (e) {
+      sessionStorage.removeItem(ADMIN_TAB_SESSION_KEY);
       router.push('/admin/login');
     }
   };

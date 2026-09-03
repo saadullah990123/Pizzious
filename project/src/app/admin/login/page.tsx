@@ -13,9 +13,12 @@ function AdminLoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [sessionExpiredReason, setSessionExpiredReason] = useState<'expired' | 'inactivity' | null>(null);
 
   useEffect(() => {
-    setSessionExpired(searchParams.get('reason') === 'expired');
+    const reason = searchParams.get('reason');
+    setSessionExpired(reason === 'expired' || reason === 'inactivity');
+    setSessionExpiredReason(reason === 'expired' || reason === 'inactivity' ? reason : null);
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,6 +38,7 @@ function AdminLoginForm() {
         throw new Error(data.error || 'Invalid credentials');
       }
 
+      sessionStorage.setItem('pizzious_admin_tab_session', 'active');
       router.push('/admin');
       router.refresh();
     } catch (err: any) {
@@ -65,7 +69,11 @@ function AdminLoginForm() {
           {sessionExpired && !error && (
             <div className="flex items-center gap-2.5 rounded-2xl border border-amber-200 bg-amber-50 p-3.5 text-xs text-amber-800">
               <Clock className="h-4 w-4 shrink-0" />
-              <span>Your session expired. Please sign in again to continue.</span>
+              <span>
+                {sessionExpiredReason === 'inactivity'
+                  ? 'Session expired due to inactivity.'
+                  : 'Your session expired. Please sign in again to continue.'}
+              </span>
             </div>
           )}
           {error && (
