@@ -158,7 +158,7 @@ Visit **`http://localhost:3000`** for the storefront, and **`http://localhost:30
 <div align="center">
 
 ### 🏠 Homepage
-<img width="1907" height="900" alt="Pizzious homepage" src="REPLACE_WITH_HOMEPAGE_IMAGE_URL" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e2a3fdaf-88a5-4514-b3a3-0c6f278c72f7" />
 
 ### 🍕 Menu & Categories
 <img width="1907" height="900" alt="Pizzious menu page" src="REPLACE_WITH_MENU_IMAGE_URL" />
