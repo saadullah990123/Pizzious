@@ -48,6 +48,15 @@ const CATEGORY_CONFIG: Record<string, { slug: string; title: string; description
   },
 };
 
+const CATEGORY_TABS = [
+  { href: '/menu/pizzas', label: '🍕 Pizzas' },
+  { href: '/menu/burgers', label: '🍔 Burgers' },
+  { href: '/menu/fries-and-sides', label: '🍟 Sides' },
+  { href: '/menu/drinks', label: '🥤 Drinks' },
+  { href: '/menu/pastas', label: '🍝 Pastas' },
+  { href: '/menu/sandwiches', label: '🥪 Sandwiches' },
+];
+
 export default function CategoryPage() {
   const params = useParams<{ category: string }>();
   const category = CATEGORY_CONFIG[params.category];
@@ -84,7 +93,7 @@ export default function CategoryPage() {
           <PizziousLogo size="sm" href="/" />
           <Link href="/" className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-3 py-2 text-xs font-black text-neutral-700 shadow-sm transition-colors hover:border-brand-flame hover:text-brand-flame">
             <ArrowLeft className="h-4 w-4" />
-            Back to Storefront
+            Back to All Categories
           </Link>
         </div>
       </header>
@@ -97,6 +106,34 @@ export default function CategoryPage() {
           </h1>
           <p className="mt-3 text-base leading-relaxed text-neutral-600">{category.description}</p>
         </div>
+
+        <nav className="mb-10 -mx-4 overflow-x-auto px-4 no-scrollbar sm:mx-0 sm:px-0" aria-label="Menu categories">
+          <div className="flex min-w-max gap-2 rounded-2xl border border-neutral-200 bg-white p-2 shadow-sm">
+            <Link
+              href="/"
+              className="rounded-xl border border-transparent px-4 py-2.5 text-xs font-black text-neutral-600 transition-colors hover:border-neutral-200 hover:bg-neutral-50 hover:text-brand-flame"
+            >
+              All Categories
+            </Link>
+            {CATEGORY_TABS.map((tab) => {
+              const isActive = tab.href === `/menu/${params.category}`;
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  className={`rounded-xl border px-4 py-2.5 text-xs font-black transition-colors ${
+                    isActive
+                      ? 'border-brand-flame bg-brand-flame text-white shadow-glow-flame'
+                      : 'border-transparent text-neutral-600 hover:border-neutral-200 hover:bg-neutral-50 hover:text-brand-flame'
+                  }`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {tab.label}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
 
         {loading ? (
           <div className="flex min-h-64 items-center justify-center">
