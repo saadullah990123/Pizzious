@@ -19,6 +19,7 @@ import { ProductCard } from '@/components/ProductCard';
 import { PizziousLogo } from '@/components/PizziousLogo';
 import { FloatingWhatsApp } from '@/components/FloatingWhatsApp';
 import { Footer } from '@/components/Footer';
+import { CheckoutModal } from '@/components/CheckoutModal';
 import { useCart } from '@/context/CartContext';
 import { MenuItem, StoreSettings } from '@/lib/types';
 import { formatCurrency } from '@/lib/utils';
@@ -28,7 +29,7 @@ const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1565299624946-b28f40a0
 function ProductDetailContent() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const { addItem } = useCart();
+  const { addItem, setIsCartOpen, setIsCheckoutOpen } = useCart();
   const [item, setItem] = useState<MenuItem | null>(null);
   const [relatedItems, setRelatedItems] = useState<MenuItem[]>([]);
   const [settings, setSettings] = useState<StoreSettings | null>(null);
@@ -81,6 +82,13 @@ function ProductDetailContent() {
     addItem(item, quantity);
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 1400);
+  };
+
+  const buyNow = () => {
+    if (!item) return;
+    addItem(item, quantity);
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
   };
 
   if (loading) {
@@ -177,7 +185,7 @@ function ProductDetailContent() {
               {hasSale && <span className="pb-1 text-sm font-mono text-neutral-400 line-through">{formatCurrency(item.price)}</span>}
             </div>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-6 grid w-full grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)] items-center gap-2 sm:flex sm:flex-wrap sm:gap-3">
               <div className="flex items-center rounded-xl border border-neutral-300 bg-neutral-50">
                 <button type="button" onClick={() => setQuantity((current) => Math.max(1, current - 1))} className="p-3 text-neutral-700 hover:text-brand-flame" aria-label="Decrease quantity">
                   <Minus className="h-4 w-4" />
@@ -190,10 +198,18 @@ function ProductDetailContent() {
               <button
                 type="button"
                 onClick={addProductToCart}
-                className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-flame to-orange-500 px-6 py-3 text-sm font-black text-white shadow-glow-flame transition-transform hover:scale-[1.02] active:scale-[0.98] sm:flex-none"
+                className="inline-flex min-h-12 min-w-0 items-center justify-center gap-1 rounded-xl bg-gradient-to-r from-brand-flame to-orange-500 px-2 py-3 text-xs font-black text-white shadow-glow-flame transition-transform hover:scale-[1.02] active:scale-[0.98] sm:gap-2 sm:px-5 sm:text-sm sm:flex-none"
               >
                 {isAdded ? <Check className="h-5 w-5" /> : <ShoppingBag className="h-5 w-5" />}
                 {isAdded ? 'Added to Cart' : 'Add to Cart'}
+              </button>
+              <button
+                type="button"
+                onClick={buyNow}
+                className="inline-flex min-h-12 min-w-0 items-center justify-center gap-1 rounded-xl bg-gradient-to-r from-brand-flame to-orange-500 px-2 py-3 text-xs font-black text-white shadow-glow-flame transition-transform hover:scale-[1.02] active:scale-[0.98] sm:gap-2 sm:px-5 sm:text-sm sm:flex-none"
+              >
+                <ShoppingBag className="h-5 w-5" />
+                Buy Now
               </button>
             </div>
           </div>
@@ -218,6 +234,7 @@ function ProductDetailContent() {
       </main>
 
       <Footer settings={settings} />
+      <CheckoutModal settings={settings} />
       <FloatingWhatsApp />
     </div>
   );
