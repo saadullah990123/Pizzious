@@ -6,14 +6,14 @@
 
 Order pizzas, burgers, deals & combos online, track your order, and pay your way — while the team behind the counter manages every item, order, and setting from one dashboard.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Site-black?style=for-the-badge&logo=vercel)](pizzious.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Site-black?style=for-the-badge&logo=vercel)](https://pizzious.vercel.app)
 ![Next.js](https://img.shields.io/badge/Next.js%2014-000000?style=for-the-badge&logo=next.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-🔗 **pizzious.vercel.app**
+🔗 **[pizzious.vercel.app](https://pizzious.vercel.app)**
 
 </div>
 
@@ -158,29 +158,19 @@ Visit **`http://localhost:3000`** for the storefront, and **`http://localhost:30
 <div align="center">
 
 ### 🏠 Homepage
-<img width="1906" height="906" alt="image" src="https://github.com/user-attachments/assets/91ad124a-d02b-496e-9d48-98e007663f23" />
+<img width="1907" height="900" alt="Pizzious homepage" src="REPLACE_WITH_HOMEPAGE_IMAGE_URL" />
 
 ### 🍕 Menu & Categories
-<img width="1897" height="908" alt="image" src="https://github.com/user-attachments/assets/513c1376-b70c-4e2f-a349-1e862784a7fe" />
-
-<img width="1917" height="886" alt="image" src="https://github.com/user-attachments/assets/0a92b79e-8811-42e5-9dd9-c5ff961110cb" />
+<img width="1907" height="900" alt="Pizzious menu page" src="REPLACE_WITH_MENU_IMAGE_URL" />
 
 ### 🛒 Cart & Checkout
-<img width="1821" height="810" alt="image" src="https://github.com/user-attachments/assets/728cfac4-eeec-4164-b183-ac6cdb7f1c9b" />
-
-<img width="1907" height="832" alt="image" src="https://github.com/user-attachments/assets/9cb1945f-ca27-47c5-820d-cccfde60a2ea" />
-
-<img width="1901" height="905" alt="image" src="https://github.com/user-attachments/assets/ddb34469-2dc1-452f-8515-f2a60ab7faf2" />
-
+<img width="1907" height="900" alt="Pizzious cart drawer" src="REPLACE_WITH_CART_IMAGE_URL" />
+<img width="1907" height="900" alt="Pizzious checkout modal" src="REPLACE_WITH_CHECKOUT_IMAGE_URL" />
 
 ### 🔐 Admin Dashboard
-<img width="1902" height="917" alt="image" src="https://github.com/user-attachments/assets/c978c878-a179-4d0f-afe6-fc923c265dca" />
-
-<img width="1897" height="911" alt="image" src="https://github.com/user-attachments/assets/3b7516a3-3252-45e5-9ac3-f9b429e1adf2" />
-
-<img width="1896" height="912" alt="image" src="https://github.com/user-attachments/assets/73d05a8c-36d6-4870-9346-6a168f55a04b" />
-
-<img width="1907" height="861" alt="image" src="https://github.com/user-attachments/assets/67bb6971-b6ca-4fc9-b11b-a01ffa67cf7c" />
+<img width="1907" height="900" alt="Pizzious admin dashboard overview" src="REPLACE_WITH_ADMIN_OVERVIEW_IMAGE_URL" />
+<img width="1907" height="900" alt="Pizzious admin orders management" src="REPLACE_WITH_ADMIN_ORDERS_IMAGE_URL" />
+<img width="1907" height="900" alt="Pizzious admin item management" src="REPLACE_WITH_ADMIN_ITEMS_IMAGE_URL" />
 
 </div>
 
