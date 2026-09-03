@@ -32,6 +32,7 @@ const NAV_ITEMS = [
   { href: '#fries', label: 'Sides' },
   { href: '#drinks', label: 'Drinks' },
   { href: '#contact', label: 'Branches' },
+  { href: '/track', label: 'Track Order' },
 ];
 
 export default function HomePage() {
@@ -53,6 +54,7 @@ export default function HomePage() {
     window.addEventListener('hashchange', updateFromHash);
 
     const sections = NAV_ITEMS
+      .filter(({ href }) => href.startsWith('#'))
       .map(({ href }) => document.querySelector(href))
       .filter((section): section is Element => Boolean(section));
 
@@ -480,7 +482,7 @@ export default function HomePage() {
               </div>
             ) : filteredItems.length === 0 ? (
               <div className="rounded-3xl border border-neutral-200 bg-white p-12 text-center">
-                <p className="text-lg font-black text-[#111111]">No items found</p>
+                <p className="text-lg font-black text-[#111111]">No items found matching your search.</p>
                 <p className="mt-2 text-sm text-[#555555]">Try another search or clear the filter to see all menu items.</p>
                 {(searchQuery.trim() || selectedCategorySlug !== 'all') && (
                   <button

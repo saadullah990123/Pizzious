@@ -110,7 +110,7 @@ function TrackOrderContent() {
       <header className="bg-brand-dark border-b border-brand-border py-4 px-6">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <PizziousLogo size="sm" />
-          <Link href="/" className="flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white transition-colors">
+          <Link href="/" className="flex items-center gap-1.5 text-xs text-neutral-200 hover:text-white transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Menu
           </Link>
@@ -127,7 +127,7 @@ function TrackOrderContent() {
           <h1 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
             Track Your Order
           </h1>
-          <p className="text-neutral-400 text-xs sm:text-sm">
+          <p className="text-neutral-200 text-xs sm:text-sm">
             Enter your order number from your confirmation screen to check live delivery status.
           </p>
         </div>
@@ -141,7 +141,7 @@ function TrackOrderContent() {
               value={orderNumber}
               onChange={(e) => setOrderNumber(e.target.value.toUpperCase())}
               placeholder="e.g. PIZ-A3B14592"
-              className="w-full bg-brand-card border border-brand-border rounded-2xl pl-10 pr-4 py-3 text-white text-sm font-mono placeholder-neutral-500 focus:outline-none focus:border-brand-flame transition-colors"
+              className="w-full bg-brand-card border border-brand-border rounded-2xl pl-10 pr-4 py-3 text-white caret-white text-sm font-mono placeholder:text-neutral-400 focus:outline-none focus:border-brand-flame transition-colors"
             />
           </div>
           <button
@@ -171,11 +171,11 @@ function TrackOrderContent() {
                 <statusInfo.icon className={`w-7 h-7 ${statusInfo.color}`} />
               </div>
               <div>
-                <p className="text-xs text-neutral-400 font-mono">Order {order.orderNumber}</p>
+                <p className="text-xs text-neutral-200 font-mono">Order {order.orderNumber}</p>
                 <h2 className={`text-xl font-black ${statusInfo.color}`}>
                   {statusInfo.label}
                 </h2>
-                <p className="text-xs text-neutral-300 mt-0.5">
+                <p className="text-xs text-neutral-200 mt-0.5">
                   Payment: <span className="font-bold text-white">{order.paymentStatus}</span>
                 </p>
               </div>
@@ -184,7 +184,7 @@ function TrackOrderContent() {
             {/* Progress Bar (only for non-cancelled) */}
             {order.orderStatus !== 'Cancelled' && (
               <div className="bg-brand-card border border-brand-border p-5 rounded-2xl space-y-4">
-                <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Delivery Progress</h3>
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">Delivery Progress</h3>
                 <div className="flex items-center gap-0">
                   {steps.map((step, idx) => {
                     const isDone = currentStepIndex >= idx;
@@ -201,7 +201,7 @@ function TrackOrderContent() {
                           >
                             {isDone ? <CheckCircle2 className="w-4 h-4" /> : <span className="text-[10px] font-bold">{idx + 1}</span>}
                           </div>
-                          <span className={`text-[10px] font-bold text-center w-16 leading-tight ${isDone ? 'text-brand-yellow' : 'text-neutral-500'}`}>
+                          <span className={`text-[10px] font-bold text-center w-16 leading-tight ${isDone ? 'text-white' : 'text-neutral-300'}`}>
                             {step}
                           </span>
                         </div>
@@ -217,25 +217,25 @@ function TrackOrderContent() {
 
             {/* Order Summary */}
             <div className="bg-brand-card border border-brand-border p-5 rounded-2xl space-y-3">
-              <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Order Summary</h3>
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Order Summary</h3>
               <div className="space-y-2">
                 {order.items?.map((item: any, idx: number) => (
                   <div key={idx} className="flex items-center justify-between text-xs py-1.5 border-b border-brand-border/40 last:border-0">
                     <div>
                       <span className="text-white font-semibold">{item.itemName}</span>
-                      <span className="text-neutral-500 ml-2">×{item.quantity}</span>
+                      <span className="text-neutral-200 ml-2">×{item.quantity}</span>
                     </div>
-                    <span className="text-neutral-300 font-mono">{formatCurrency(item.subtotal)}</span>
+                    <span className="text-white font-mono">{formatCurrency(item.subtotal)}</span>
                   </div>
                 ))}
               </div>
 
               <div className="pt-2 border-t border-brand-border space-y-1 text-xs">
-                <div className="flex justify-between text-neutral-400">
+                <div className="flex justify-between text-neutral-200">
                   <span>Subtotal:</span>
                   <span className="font-mono text-white">{formatCurrency(order.subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-neutral-400">
+                <div className="flex justify-between text-neutral-200">
                   <span>Delivery:</span>
                   <span className="font-mono">
                     {order.deliveryFee === 0
@@ -251,7 +251,7 @@ function TrackOrderContent() {
             </div>
 
             {/* Help Text */}
-            <div className="bg-brand-card border border-brand-border p-4 rounded-2xl text-xs text-neutral-400 text-center">
+            <div className="bg-brand-card border border-brand-border p-4 rounded-2xl text-xs text-neutral-200 text-center">
               Questions about your order? 
               <a
                 href={`https://wa.me/${(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+923251020222').replace(/[^0-9]/g, '')}?text=Hi Pizzious! I want to check my order ${order.orderNumber}`}
