@@ -158,19 +158,29 @@ Visit **`http://localhost:3000`** for the storefront, and **`http://localhost:30
 <div align="center">
 
 ### 🏠 Homepage
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e2a3fdaf-88a5-4514-b3a3-0c6f278c72f7" />
+<img width="1906" height="906" alt="image" src="https://github.com/user-attachments/assets/91ad124a-d02b-496e-9d48-98e007663f23" />
 
 ### 🍕 Menu & Categories
-<img width="1907" height="900" alt="Pizzious menu page" src="REPLACE_WITH_MENU_IMAGE_URL" />
+<img width="1897" height="908" alt="image" src="https://github.com/user-attachments/assets/513c1376-b70c-4e2f-a349-1e862784a7fe" />
+
+<img width="1917" height="886" alt="image" src="https://github.com/user-attachments/assets/0a92b79e-8811-42e5-9dd9-c5ff961110cb" />
 
 ### 🛒 Cart & Checkout
-<img width="1907" height="900" alt="Pizzious cart drawer" src="REPLACE_WITH_CART_IMAGE_URL" />
-<img width="1907" height="900" alt="Pizzious checkout modal" src="REPLACE_WITH_CHECKOUT_IMAGE_URL" />
+<img width="1821" height="810" alt="image" src="https://github.com/user-attachments/assets/728cfac4-eeec-4164-b183-ac6cdb7f1c9b" />
+
+<img width="1907" height="832" alt="image" src="https://github.com/user-attachments/assets/9cb1945f-ca27-47c5-820d-cccfde60a2ea" />
+
+<img width="1901" height="905" alt="image" src="https://github.com/user-attachments/assets/ddb34469-2dc1-452f-8515-f2a60ab7faf2" />
+
 
 ### 🔐 Admin Dashboard
-<img width="1907" height="900" alt="Pizzious admin dashboard overview" src="REPLACE_WITH_ADMIN_OVERVIEW_IMAGE_URL" />
-<img width="1907" height="900" alt="Pizzious admin orders management" src="REPLACE_WITH_ADMIN_ORDERS_IMAGE_URL" />
-<img width="1907" height="900" alt="Pizzious admin item management" src="REPLACE_WITH_ADMIN_ITEMS_IMAGE_URL" />
+<img width="1902" height="917" alt="image" src="https://github.com/user-attachments/assets/c978c878-a179-4d0f-afe6-fc923c265dca" />
+
+<img width="1897" height="911" alt="image" src="https://github.com/user-attachments/assets/3b7516a3-3252-45e5-9ac3-f9b429e1adf2" />
+
+<img width="1896" height="912" alt="image" src="https://github.com/user-attachments/assets/73d05a8c-36d6-4870-9346-6a168f55a04b" />
+
+<img width="1907" height="861" alt="image" src="https://github.com/user-attachments/assets/67bb6971-b6ca-4fc9-b11b-a01ffa67cf7c" />
 
 </div>
 
