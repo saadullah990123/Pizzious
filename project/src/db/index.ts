@@ -41,6 +41,29 @@ function ensureSeeded(): Promise<void> {
   return seedPromise;
 }
 
+async function syncPostgresSequences(): Promise<void> {
+  if (!pgDb) return;
+
+  // Starter rows use explicit IDs, so advance serial sequences before any
+  // later create operation asks PostgreSQL for the next generated ID.
+  await pgDb.execute(sqlRaw`
+    SELECT setval(
+      pg_get_serial_sequence('menu_items', 'id'),
+      COALESCE(MAX(id), 1),
+      COUNT(*) > 0
+    )
+    FROM menu_items
+  `);
+  await pgDb.execute(sqlRaw`
+    SELECT setval(
+      pg_get_serial_sequence('categories', 'id'),
+      COALESCE(MAX(id), 1),
+      COUNT(*) > 0
+    )
+    FROM categories
+  `);
+}
+
 async function seedPostgres(): Promise<void> {
   if (!pgDb) return;
   try {
@@ -72,6 +95,7 @@ async function seedPostgres(): Promise<void> {
       await pgDb.update(schema.menuItems)
         .set({ images: ['https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=800&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1603508102983-99b101395d1a?w=800&auto=format&fit=crop&q=80'] })
         .where(eq(schema.menuItems.slug, 'family-feast-bonanza'));
+      await syncPostgresSequences();
       return;
     }
 
@@ -115,6 +139,8 @@ async function seedPostgres(): Promise<void> {
     }).onConflictDoNothing();
 
     await pgDb.insert(schema.storeSettings).values(initialStoreSettings).onConflictDoNothing();
+
+    await syncPostgresSequences();
 
     console.log('[db] Seeded Postgres database with starter menu, categories, settings, and admin account.');
   } catch (err) {
