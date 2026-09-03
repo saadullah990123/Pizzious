@@ -6,14 +6,14 @@
 
 Order pizzas, burgers, deals & combos online, track your order, and pay your way — while the team behind the counter manages every item, order, and setting from one dashboard.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Site-black?style=for-the-badge&logo=vercel)](https://pizzious-mg22dmpie-williampowell8269-2291s-projects.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Site-black?style=for-the-badge&logo=vercel)](pizzious.vercel.app)
 ![Next.js](https://img.shields.io/badge/Next.js%2014-000000?style=for-the-badge&logo=next.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-🔗 **[pizzious-mg22dmpie-williampowell8269-2291s-projects.vercel.app](https://pizzious-mg22dmpie-williampowell8269-2291s-projects.vercel.app)**
+🔗 **pizzious.vercel.app**
 
 </div>
 
