@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Category, MenuItem, DealItem } from '@/lib/types';
+import { optimizeImage } from '@/lib/image-optimization';
 import { formatCurrency } from '@/lib/utils';
 import {
   Plus,
@@ -19,7 +20,7 @@ import {
   UploadCloud,
 } from 'lucide-react';
 
-const MAX_UPLOAD_SIZE_MB = 3;
+const MAX_PRODUCT_IMAGE_WIDTH = 800;
 
 export default function AdminItemsPage() {
   const [items, setItems] = useState<MenuItem[]>([]);
@@ -42,6 +43,7 @@ export default function AdminItemsPage() {
   const [price, setPrice] = useState<string>('');
   const [salePrice, setSalePrice] = useState<string>('');
   const [imageUrl, setImageUrl] = useState('');
+  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
   const [isDeal, setIsDeal] = useState(false);
   const [dealItems, setDealItems] = useState<DealItem[]>([]);
   const [isActive, setIsActive] = useState(true);
@@ -59,27 +61,26 @@ export default function AdminItemsPage() {
   const [dealItemQty, setDealItemQty] = useState('1');
   const [dealItemDesc, setDealItemDesc] = useState('');
 
-  async function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+  async function uploadImage(file: File) {
     if (!file) return;
     setUploadError(null);
 
-    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowed.includes(file.type)) {
+    if (!file.type.startsWith('image/')) {
       setUploadError('Use a JPG, PNG, WEBP, or GIF image.');
-      e.target.value = '';
-      return;
-    }
-    if (file.size > MAX_UPLOAD_SIZE_MB * 1024 * 1024) {
-      setUploadError(`That image is too large (max ${MAX_UPLOAD_SIZE_MB}MB). Try compressing it first.`);
-      e.target.value = '';
       return;
     }
 
     setIsUploading(true);
     try {
+      const optimizedFile = await optimizeImage(file, MAX_PRODUCT_IMAGE_WIDTH);
+      const localPreviewUrl = URL.createObjectURL(optimizedFile);
+      setImagePreviewUrl((previousUrl) => {
+        if (previousUrl.startsWith('blob:')) URL.revokeObjectURL(previousUrl);
+        return localPreviewUrl;
+      });
+
       const body = new FormData();
-      body.append('file', file);
+      body.append('file', optimizedFile);
       const res = await fetch('/api/admin/upload', { method: 'POST', body });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -91,9 +92,29 @@ export default function AdminItemsPage() {
       setUploadError('Upload failed. Please check your connection and try again.');
     } finally {
       setIsUploading(false);
-      e.target.value = '';
     }
   }
+
+  async function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) await uploadImage(file);
+    e.target.value = '';
+  }
+
+  async function handleImageDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) await uploadImage(file);
+  }
+
+  const removeImage = () => {
+    setImageUrl('');
+    setImagePreviewUrl((previousUrl) => {
+      if (previousUrl.startsWith('blob:')) URL.revokeObjectURL(previousUrl);
+      return '';
+    });
+    setUploadError(null);
+  };
 
   const loadData = async () => {
     try {
@@ -132,6 +153,7 @@ export default function AdminItemsPage() {
     setPrice('');
     setSalePrice('');
     setImageUrl('');
+    setImagePreviewUrl('');
     setIsDeal(dealMode);
     setDealItems([]);
     setIsActive(true);
@@ -156,6 +178,7 @@ export default function AdminItemsPage() {
     setPrice(String(item.price));
     setSalePrice(item.salePrice ? String(item.salePrice) : '');
     setImageUrl(item.images && item.images.length > 0 ? item.images[0] : '');
+    setImagePreviewUrl('');
     setIsDeal(item.isDeal);
     setDealItems(item.dealItems || []);
     setIsActive(item.isActive);
@@ -614,32 +637,71 @@ export default function AdminItemsPage() {
                 </div>
               </div>
 
-              {/* Image URL with live preview */}
+              {/* Image upload with live preview and URL fallback */}
               <div>
                 <label className="block text-xs font-semibold text-[#333333] mb-1">
-                  Product Image URL
-                  <span className="ml-1 text-neutral-500 font-normal">(Unsplash, Cloudinary, or any direct image URL)</span>
+                  Product Image
+                  <span className="ml-1 text-neutral-500 font-normal">(optimized WebP, max 800px and 200KB)</span>
                 </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={handleFileSelected}
+                  className="hidden"
+                />
+                {(imagePreviewUrl || imageUrl.trim()) ? (
+                  <div className="relative mt-2 overflow-hidden rounded-xl border border-brand-border bg-brand-darker">
+                    <img
+                      src={imagePreviewUrl || imageUrl}
+                      alt="Product preview"
+                      className="h-40 w-full object-cover"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/70 px-3 py-2">
+                      <span className="text-[10px] font-mono text-white">
+                        {isUploading ? 'Optimizing and uploading...' : 'Image ready'}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="rounded-lg bg-white px-2.5 py-1.5 text-[10px] font-bold text-[#111111] hover:bg-neutral-100"
+                        >
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={removeImage}
+                          className="rounded-lg bg-red-500 px-2.5 py-1.5 text-[10px] font-bold text-white hover:bg-red-600"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={handleImageDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-300 bg-white px-4 py-7 text-center transition-colors hover:border-brand-flame hover:bg-orange-50"
+                  >
+                    <UploadCloud className="mb-2 h-7 w-7 text-brand-flame" />
+                    <span className="text-xs font-bold text-[#333333]">Choose or drop an image here</span>
+                    <span className="mt-1 text-[10px] text-neutral-500">JPG, PNG, WEBP, or GIF. Automatically compressed below 200KB.</span>
+                  </div>
+                )}
+                {uploadError && (
+                  <p className="mt-1.5 text-[11px] font-semibold text-red-600">{uploadError}</p>
+                )}
                 <input
                   type="url"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/photo-...?w=800&auto=format&fit=crop"
-                  className="w-full bg-brand-card border border-brand-border rounded-xl px-3.5 py-2 text-[#111111] text-xs focus:outline-none focus:border-brand-flame font-mono"
+                  placeholder="Or paste an external image URL"
+                  className="mt-2 w-full bg-brand-card border border-brand-border rounded-xl px-3.5 py-2 text-[#111111] text-xs focus:outline-none focus:border-brand-flame font-mono"
                 />
-                {/* Live image preview */}
-                {imageUrl.trim() && (
-                  <div className="mt-2 rounded-xl overflow-hidden border border-brand-border bg-brand-darker">
-                    <img
-                      src={imageUrl}
-                      alt="Preview"
-                      className="w-full h-36 object-cover"
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                      onLoad={(e) => { (e.target as HTMLImageElement).style.display = 'block'; }}
-                    />
-                    <p className="text-[10px] text-neutral-500 px-3 py-1.5 font-mono">↑ Image preview (paste a valid URL above to update)</p>
-                  </div>
-                )}
+                <p className="mt-1 text-[10px] text-neutral-500">External URLs are saved as provided and are not optimized by this upload tool.</p>
               </div>
 
               {/* Dynamic Combo Deals Builder Section */}

@@ -100,9 +100,7 @@ export async function POST(req: NextRequest) {
     console.error('Error creating menu item:', error);
     return NextResponse.json({
       success: false,
-      error: error instanceof Error && error.message
-        ? `Failed to create menu item: ${error.message}`
-        : 'Failed to create menu item. Please verify the category and values, then try again.',
+      error: 'Failed to create menu item. Please verify the category and values, then try again.',
     }, { status: 500 });
   }
 }

@@ -279,7 +279,7 @@ export default function HomePage() {
         <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen overflow-hidden pt-4 sm:pt-6 lg:rounded-b-[32px]">
           <div className="absolute inset-0">
             <Image
-              src="/images/hero-cheese-pizza.png"
+              src={settings?.heroImageUrl || '/images/hero-cheese-pizza.png'}
               alt="Melting cheese pull on a fresh Pizzious pizza"
               fill
               sizes="100vw"

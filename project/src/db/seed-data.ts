@@ -1025,4 +1025,5 @@ export const initialStoreSettings = {
   isAnnouncementActive: true,
   heroTitle: "Crave the Crunch. Taste the Flame.",
   heroSubtitle: "Handcrafted gourmet pizzas, sizzling smash burgers, and irresistible combo deals delivered piping hot to your doorstep in 30 minutes.",
+  heroImageUrl: null,
 };

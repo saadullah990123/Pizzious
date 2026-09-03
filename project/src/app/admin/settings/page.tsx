@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StoreSettings } from '@/lib/types';
+import { optimizeImage } from '@/lib/image-optimization';
 import {
   Settings,
   Save,
@@ -57,6 +58,10 @@ export default function AdminSettingsPage() {
   const [isAnnouncementActive, setIsAnnouncementActive] = useState(true);
   const [heroTitle, setHeroTitle] = useState('');
   const [heroSubtitle, setHeroSubtitle] = useState('');
+  const [heroImageUrl, setHeroImageUrl] = useState('');
+  const [heroImagePreviewUrl, setHeroImagePreviewUrl] = useState('');
+  const [isUploadingHeroImage, setIsUploadingHeroImage] = useState(false);
+  const heroImageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function loadSettings() {
@@ -94,6 +99,7 @@ export default function AdminSettingsPage() {
             setIsAnnouncementActive(s.isAnnouncementActive !== false);
             setHeroTitle(s.heroTitle || '');
             setHeroSubtitle(s.heroSubtitle || '');
+            setHeroImageUrl(s.heroImageUrl || '');
           }
         }
       } catch (err) {
@@ -140,6 +146,7 @@ export default function AdminSettingsPage() {
         isAnnouncementActive,
         heroTitle,
         heroSubtitle,
+        heroImageUrl: heroImageUrl.trim() || null,
       };
 
       const res = await fetch('/api/admin/settings', {
@@ -159,6 +166,33 @@ export default function AdminSettingsPage() {
       setErrorMessage(err.message || 'Error updating settings');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const uploadHeroImage = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setErrorMessage('Use a JPG, PNG, WEBP, or GIF image for the banner.');
+      return;
+    }
+    setErrorMessage(null);
+    setIsUploadingHeroImage(true);
+    try {
+      const optimizedFile = await optimizeImage(file, 1200);
+      const localPreviewUrl = URL.createObjectURL(optimizedFile);
+      setHeroImagePreviewUrl((previousUrl) => {
+        if (previousUrl.startsWith('blob:')) URL.revokeObjectURL(previousUrl);
+        return localPreviewUrl;
+      });
+      const body = new FormData();
+      body.append('file', optimizedFile);
+      const res = await fetch('/api/admin/upload', { method: 'POST', body });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Banner upload failed.');
+      setHeroImageUrl(data.url);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Banner upload failed.');
+    } finally {
+      setIsUploadingHeroImage(false);
     }
   };
 
@@ -596,6 +630,48 @@ export default function AdminSettingsPage() {
                   className="w-full bg-white border border-neutral-300 rounded-xl px-3.5 py-2 text-[#111111] text-xs focus:outline-none focus:border-brand-flame"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-neutral-600 mb-1">
+                Hero Banner Image <span className="ml-1 text-neutral-500 font-normal">(optimized WebP, max 1200px and 200KB)</span>
+              </label>
+              <input
+                ref={heroImageInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={async (event) => {
+                  const file = event.target.files?.[0];
+                  if (file) await uploadHeroImage(file);
+                  event.target.value = '';
+                }}
+                className="hidden"
+              />
+              {(heroImagePreviewUrl || heroImageUrl) ? (
+                <div className="relative overflow-hidden rounded-xl border border-brand-border bg-brand-darker">
+                  <img src={heroImagePreviewUrl || heroImageUrl} alt="Hero banner preview" className="h-40 w-full object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/70 px-3 py-2">
+                    <span className="text-[10px] font-mono text-white">
+                      {isUploadingHeroImage ? 'Optimizing and uploading...' : 'Banner image ready'}
+                    </span>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => heroImageInputRef.current?.click()} className="rounded-lg bg-white px-2.5 py-1.5 text-[10px] font-bold text-[#111111]">Replace</button>
+                      <button type="button" onClick={() => { setHeroImageUrl(''); setHeroImagePreviewUrl(''); }} className="rounded-lg bg-red-500 px-2.5 py-1.5 text-[10px] font-bold text-white">Remove</button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={async (event) => { event.preventDefault(); const file = event.dataTransfer.files?.[0]; if (file) await uploadHeroImage(file); }}
+                  onClick={() => heroImageInputRef.current?.click()}
+                  className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-300 bg-white px-4 py-7 text-center transition-colors hover:border-brand-flame hover:bg-orange-50"
+                >
+                  <ImageIcon className="mb-2 h-7 w-7 text-brand-flame" />
+                  <span className="text-xs font-bold text-[#333333]">Choose or drop a banner image here</span>
+                  <span className="mt-1 text-[10px] text-neutral-500">JPG, PNG, WEBP, or GIF. Automatically compressed below 200KB.</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

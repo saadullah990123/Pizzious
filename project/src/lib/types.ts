@@ -117,6 +117,7 @@ export interface StoreSettings {
   isAnnouncementActive: boolean;
   heroTitle: string;
   heroSubtitle: string;
+  heroImageUrl?: string | null;
   updatedAt?: string;
 }
 

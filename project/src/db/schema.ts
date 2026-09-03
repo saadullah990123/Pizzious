@@ -113,6 +113,7 @@ export const storeSettings = pgTable('store_settings', {
   isAnnouncementActive: boolean('is_announcement_active').default(true).notNull(),
   heroTitle: text('hero_title').default('Crave the Crunch. Taste the Flame.').notNull(),
   heroSubtitle: text('hero_subtitle').default('Handcrafted gourmet pizzas, sizzling smash burgers, and irresistible combo deals delivered hot to your doorstep.').notNull(),
+  heroImageUrl: text('hero_image_url'),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 

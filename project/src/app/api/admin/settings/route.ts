@@ -48,6 +48,7 @@ export async function PATCH(req: NextRequest) {
       'isAnnouncementActive',
       'heroTitle',
       'heroSubtitle',
+      'heroImageUrl',
     ];
 
     const cleanUpdate: any = {};

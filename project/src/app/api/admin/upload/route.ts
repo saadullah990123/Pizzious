@@ -4,10 +4,9 @@ import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
 
-// Keep uploads small and predictable — this is a food-ordering site, not a
-// photo host. 3MB is plenty for a compressed product photo and keeps page
-// load fast for customers on mobile data.
-const MAX_FILE_SIZE_BYTES = 3 * 1024 * 1024; // 3MB
+// Client-side optimization is the primary compression path; this server guard
+// prevents oversized files from being stored if the endpoint is called directly.
+const MAX_FILE_SIZE_BYTES = 200 * 1024;
 const ALLOWED_MIME_TYPES: Record<string, string> = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
@@ -41,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
       return NextResponse.json(
-        { success: false, error: `Image is too large. Max size is ${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB — try compressing it first.` },
+        { success: false, error: 'Image is too large. Images must be under 200KB.' },
         { status: 413 }
       );
     }
