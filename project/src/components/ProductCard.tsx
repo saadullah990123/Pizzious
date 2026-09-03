@@ -6,6 +6,7 @@ import { MenuItem } from '@/lib/types';
 import { useCart } from '@/context/CartContext';
 import { formatCurrency } from '@/lib/utils';
 import { Plus, Flame, Sparkles, Check } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface ProductCardProps {
   item: MenuItem;
@@ -13,6 +14,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
   const { addItem } = useCart();
+  const router = useRouter();
   const [isAdded, setIsAdded] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
 
@@ -26,13 +28,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
     setTimeout(() => setIsAdded(false), 1200);
   };
 
+  const openDetails = () => router.push(`/product/${item.id}`);
+
   const mainImage = item.images && item.images.length > 0
     ? item.images[0]
     : 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&auto=format&fit=crop&q=80';
   const fallbackImage = 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&auto=format&fit=crop&q=80';
 
   return (
-    <div className="group relative bg-white hover:bg-neutral-50/50 border border-neutral-200 hover:border-brand-flame/60 rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 shadow-card hover:shadow-card-hover">
+    <div
+      className="group relative cursor-pointer bg-white hover:bg-neutral-50/50 border border-neutral-200 hover:border-brand-flame/60 rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 shadow-card hover:shadow-card-hover"
+      onClick={openDetails}
+      onKeyDown={(event) => {
+        if (event.target instanceof HTMLElement && event.target.closest('button')) return;
+        if (event.key === 'Enter' || event.key === ' ') openDetails();
+      }}
+      role="link"
+      tabIndex={0}
+      aria-label={`View details for ${item.name}`}
+    >
       {/* Card Image Container */}
       <div className="relative w-full h-48 sm:h-52 overflow-hidden bg-neutral-100">
         <Image
@@ -94,7 +108,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
           </div>
 
           <button
-            onClick={handleAddToCart}
+            onClick={(event) => {
+              event.stopPropagation();
+              handleAddToCart();
+            }}
             className={`flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 shadow-sm ${
               isAdded
                 ? 'bg-emerald-600 text-white'

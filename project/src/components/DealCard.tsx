@@ -6,6 +6,7 @@ import { MenuItem } from '@/lib/types';
 import { useCart } from '@/context/CartContext';
 import { formatCurrency } from '@/lib/utils';
 import { Flame, Check, Plus, PackageCheck } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface DealCardProps {
   deal: MenuItem;
@@ -13,6 +14,7 @@ interface DealCardProps {
 
 export const DealCard: React.FC<DealCardProps> = ({ deal }) => {
   const { addItem } = useCart();
+  const router = useRouter();
   const [isAdded, setIsAdded] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
 
@@ -26,13 +28,25 @@ export const DealCard: React.FC<DealCardProps> = ({ deal }) => {
     setTimeout(() => setIsAdded(false), 1200);
   };
 
+  const openDetails = () => router.push(`/product/${deal.id}`);
+
   const mainImage = deal.images && deal.images.length > 0
     ? deal.images[0]
     : 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&auto=format&fit=crop&q=80';
   const fallbackImage = 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&auto=format&fit=crop&q=80';
 
   return (
-    <div className="group relative bg-white border-2 border-orange-200 hover:border-brand-flame rounded-3xl overflow-hidden flex flex-col justify-between transition-all duration-300 shadow-card hover:shadow-card-hover">
+    <div
+      className="group relative cursor-pointer bg-white border-2 border-orange-200 hover:border-brand-flame rounded-3xl overflow-hidden flex flex-col justify-between transition-all duration-300 shadow-card hover:shadow-card-hover"
+      onClick={openDetails}
+      onKeyDown={(event) => {
+        if (event.target instanceof HTMLElement && event.target.closest('button')) return;
+        if (event.key === 'Enter' || event.key === ' ') openDetails();
+      }}
+      role="link"
+      tabIndex={0}
+      aria-label={`View details for ${deal.name}`}
+    >
       
       {/* Top Banner Tag */}
       <div className="bg-gradient-to-r from-brand-flame to-amber-500 text-white text-[11px] font-black py-1.5 px-4 uppercase tracking-widest flex items-center justify-between shadow-sm">
@@ -102,7 +116,10 @@ export const DealCard: React.FC<DealCardProps> = ({ deal }) => {
           </div>
 
           <button
-            onClick={handleAddToCart}
+            onClick={(event) => {
+              event.stopPropagation();
+              handleAddToCart();
+            }}
             className={`flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-black text-sm transition-all duration-200 shadow-md ${
               isAdded
                 ? 'bg-emerald-600 text-white'
