@@ -21,7 +21,7 @@ export const HotDealsCarousel: React.FC<HotDealsCarouselProps> = ({ deals }) => 
 
     const interval = window.setInterval(() => {
       setActiveIndex((current) => (current + 1) % visibleDeals.length);
-    }, 4500);
+    }, 3800);
 
     return () => window.clearInterval(interval);
   }, [isPaused, visibleDeals.length]);
@@ -92,7 +92,9 @@ export const HotDealsCarousel: React.FC<HotDealsCarouselProps> = ({ deals }) => 
               <DealCard
                 deal={{
                   ...deal,
-                  images: [DEAL_PLACEHOLDER_IMAGES[index % DEAL_PLACEHOLDER_IMAGES.length]],
+                  images: deal.images?.length
+                    ? deal.images
+                    : [DEAL_PLACEHOLDER_IMAGES[index % DEAL_PLACEHOLDER_IMAGES.length]],
                 }}
               />
             </div>
