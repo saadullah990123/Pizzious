@@ -134,7 +134,7 @@ export const DealCard: React.FC<DealCardProps> = ({ deal }) => {
             ) : (
               <>
                 <Plus className="w-4 h-4" />
-                <span>Add to Cart</span>
+                <span>Order Now</span>
               </>
             )}
           </button>

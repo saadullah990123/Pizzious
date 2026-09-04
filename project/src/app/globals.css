@@ -88,6 +88,35 @@
   50% { box-shadow: 0 8px 30px -2px rgba(255, 69, 0, 0.45); }
 }
 
+@keyframes announcementMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.announcement-marquee-track {
+  animation: announcementMarquee 34s linear infinite;
+}
+
+.announcement-marquee:hover .announcement-marquee-track {
+  animation-play-state: paused;
+}
+
+.hot-deals-track {
+  --hot-deals-visible: 1;
+}
+
+@media (min-width: 640px) {
+  .hot-deals-track {
+    --hot-deals-visible: 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hot-deals-track {
+    --hot-deals-visible: 3;
+  }
+}
+
 /* Reveal-on-scroll: starts hidden, .in-view triggers the animation once */
 .reveal-on-scroll {
   opacity: 0;
@@ -152,6 +181,7 @@
   .animate-float-slow,
   .animate-glow-pulse,
   .animate-whatsapp-glow,
+  .announcement-marquee-track,
   .animate-bounce,
   .animate-pulse {
     animation: none !important;

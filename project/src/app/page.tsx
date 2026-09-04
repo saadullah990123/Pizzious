@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Category, MenuItem, StoreSettings } from '@/lib/types';
 import { CategoryNav } from '@/components/CategoryNav';
 import Image from 'next/image';
-import { DealCard } from '@/components/DealCard';
+import { HotDealsCarousel } from '@/components/HotDealsCarousel';
 import { ProductCard } from '@/components/ProductCard';
 import { CartDrawer } from '@/components/CartDrawer';
 import { useCart } from '@/context/CartContext';
@@ -13,6 +13,7 @@ import { FloatingWhatsApp } from '@/components/FloatingWhatsApp';
 import { Footer } from '@/components/Footer';
 import { PizziousLogo } from '@/components/PizziousLogo';
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { ANNOUNCEMENT_MESSAGES } from '@/lib/storefront-content';
 import { Flame, Search, Sparkles, ChefHat, Award, Clock, ArrowRight, Phone, ShoppingBag, MapPin, Menu, X } from 'lucide-react';
 
 // Category emoji + label map for section headings
@@ -267,13 +268,15 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── Announcement Banner ── */}
-      <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8 sm:py-4">
-        <div className="rounded-[18px] border border-neutral-200 bg-[#f7f5f2] px-4 py-3 text-sm font-semibold text-[#111111] shadow-sm">
-          <div className="flex items-center gap-2">
-            <Flame className="h-4 w-4 fill-brand-flame text-brand-flame" />
-            <span>FREE Delivery on orders over Rs. 2,500!</span>
-          </div>
+      {/* ── Announcement Marquee ── */}
+      <div className="announcement-marquee overflow-hidden bg-brand-flame text-white" aria-label="Store announcements">
+        <div className="announcement-marquee-track flex w-max min-w-full whitespace-nowrap py-2 text-xs font-bold sm:py-2.5 sm:text-sm">
+          {[...ANNOUNCEMENT_MESSAGES, ...ANNOUNCEMENT_MESSAGES].map((message, index) => (
+            <React.Fragment key={`${message}-${index}`}>
+              <span className="px-4 sm:px-6">{message}</span>
+              <span className="text-orange-200" aria-hidden="true">•</span>
+            </React.Fragment>
+          ))}
         </div>
       </div>
 
@@ -364,6 +367,9 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── Hot Deals Carousel ── */}
+        <HotDealsCarousel deals={deals} />
+
         {/* ── Gallery / Feature Cards ── */}
         <section id="gallery" className="mt-10">
           <ScrollReveal>
@@ -407,31 +413,6 @@ export default function HomePage() {
             ))}
           </div>
         </section>
-
-        {/* ── Hot Deals Section ── */}
-        {deals.length > 0 && (
-          <section id="deals" className="mt-14">
-            <ScrollReveal>
-              <div className="mb-6 flex items-end justify-between">
-                <div>
-                  <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-brand-flame animate-glow-pulse">
-                    <Flame className="h-3.5 w-3.5 fill-brand-flame" />
-                    Limited Time Bundles
-                  </div>
-                  <h2 className="text-3xl font-black uppercase tracking-tight text-[#111111]">Hot Deals</h2>
-                </div>
-              </div>
-            </ScrollReveal>
-
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {deals.map((deal, index) => (
-                <ScrollReveal key={deal.id} delay={index * 80}>
-                  <DealCard deal={deal} />
-                </ScrollReveal>
-              ))}
-            </div>
-          </section>
-        )}
 
         {/* ── Menu Section ── */}
         <section className="mt-14">
