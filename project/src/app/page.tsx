@@ -27,10 +27,10 @@ const SECTION_META: Record<string, { emoji: string; label: string; id: string }>
 
 const NAV_ITEMS = [
   { href: '#deals', label: 'Hot Deals' },
-  { href: '#pizzas', label: 'Pizzas' },
-  { href: '#burgers', label: 'Burgers' },
-  { href: '#fries', label: 'Sides' },
-  { href: '#drinks', label: 'Drinks' },
+  { href: '/menu/pizzas', label: 'Pizzas' },
+  { href: '/menu/burgers', label: 'Burgers' },
+  { href: '/menu/fries-and-sides', label: 'Sides' },
+  { href: '/menu/drinks', label: 'Drinks' },
   { href: '#contact', label: 'Branches' },
   { href: '/track', label: 'Track Order' },
 ];
@@ -194,12 +194,15 @@ export default function HomePage() {
             {/* Desktop Nav — original links only, no new categories */}
             <nav className="hidden items-center gap-4 lg:gap-6 text-sm font-semibold text-[#111111] md:flex" aria-label="Primary navigation">
               {NAV_ITEMS.map((item) => {
-                const isActive = activeSection === item.href.slice(1);
+                const isHashLink = item.href.startsWith('#');
+                const isActive = isHashLink && activeSection === item.href.slice(1);
                 return (
                   <a
                     key={item.href}
                     href={item.href}
-                    onClick={() => setActiveSection(item.href.slice(1))}
+                    onClick={() => {
+                      if (isHashLink) setActiveSection(item.href.slice(1));
+                    }}
                     className={`group relative whitespace-nowrap py-2 transition-colors duration-200 ${isActive ? 'font-black text-brand-flame' : 'hover:text-brand-flame'}`}
                     aria-current={isActive ? 'location' : undefined}
                   >

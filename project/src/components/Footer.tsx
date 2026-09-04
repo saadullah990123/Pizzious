@@ -80,24 +80,34 @@ export const Footer: React.FC<FooterProps> = ({ settings }) => {
                 </a>
               </li>
               <li>
-                <a href="#pizzas" className="text-neutral-700 hover:text-brand-flame transition-colors flex items-center gap-1.5">
+                <Link href="/menu/pizzas" className="text-neutral-700 hover:text-brand-flame transition-colors flex items-center gap-1.5">
                   <span>🍕 Gourmet Pizzas</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#burgers" className="text-neutral-700 hover:text-brand-flame transition-colors flex items-center gap-1.5">
+                <Link href="/menu/burgers" className="text-neutral-700 hover:text-brand-flame transition-colors flex items-center gap-1.5">
                   <span>🍔 Sizzling Smash Burgers</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#sides" className="text-neutral-700 hover:text-brand-flame transition-colors flex items-center gap-1.5">
-                  <span>🍝 Pastas & Loaded Fries</span>
-                </a>
+                <Link href="/menu/fries-and-sides" className="text-neutral-700 hover:text-brand-flame transition-colors flex items-center gap-1.5">
+                  <span>🍟 Fries & Loaded Sides</span>
+                </Link>
               </li>
               <li>
-                <a href="#drinks" className="text-neutral-700 hover:text-brand-flame transition-colors flex items-center gap-1.5">
+                <Link href="/menu/drinks" className="text-neutral-700 hover:text-brand-flame transition-colors flex items-center gap-1.5">
                   <span>🥤 Shakes & Beverages</span>
-                </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/menu/pastas" className="text-neutral-700 hover:text-brand-flame transition-colors flex items-center gap-1.5">
+                  <span>🍝 Fresh Pastas</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/menu/sandwiches" className="text-neutral-700 hover:text-brand-flame transition-colors flex items-center gap-1.5">
+                  <span>🥪 Sandwiches & Wraps</span>
+                </Link>
               </li>
               <li>
                 <Link href="/track" className="text-neutral-700 hover:text-brand-flame transition-colors flex items-center gap-1.5">

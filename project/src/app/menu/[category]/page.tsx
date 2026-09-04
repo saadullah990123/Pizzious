@@ -7,6 +7,7 @@ import { ArrowLeft, Loader2, Utensils } from 'lucide-react';
 import { ProductCard } from '@/components/ProductCard';
 import { PizziousLogo } from '@/components/PizziousLogo';
 import { FloatingWhatsApp } from '@/components/FloatingWhatsApp';
+import { Footer } from '@/components/Footer';
 import { MenuItem } from '@/lib/types';
 
 const CATEGORY_CONFIG: Record<string, { slug: string; title: string; description: string; emoji: string }> = {
@@ -145,11 +146,12 @@ export default function CategoryPage() {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {items.map((item) => <ProductCard key={item.id} item={item} />)}
+            {items.slice(0, 7).map((item) => <ProductCard key={item.id} item={item} />)}
           </div>
         )}
       </main>
 
+      <Footer />
       <FloatingWhatsApp />
     </div>
   );
