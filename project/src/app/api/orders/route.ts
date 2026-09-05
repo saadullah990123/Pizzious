@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { generateOrderNumber } from '@/lib/utils';
+import { generateOrderNumber, sanitizeCustomerInput } from '@/lib/utils';
 import { PaymentMethod, PaymentStatus, OrderStatus, OrderItem } from '@/lib/types';
 
 // Lightweight per-IP rate limit — stops a script from flooding the order
@@ -55,22 +55,29 @@ export async function POST(req: NextRequest) {
       items,
     } = body;
 
+    const cleanCustomerName = sanitizeCustomerInput(customerName, 100);
+    const cleanCustomerPhone = sanitizeCustomerInput(customerPhone, 30);
+    const cleanCustomerEmail = sanitizeCustomerInput(customerEmail, 254);
+    const cleanDeliveryAddress = sanitizeCustomerInput(deliveryAddress, 1000);
+    const cleanDeliveryNotes = sanitizeCustomerInput(deliveryNotes, 500);
+    const cleanTransactionReference = sanitizeCustomerInput(transactionReference, 200);
+
     // 1. Rigorous Server-Side Input Validation
-    if (!customerName || typeof customerName !== 'string' || customerName.trim().length < 2) {
+    if (cleanCustomerName.length < 2) {
       return NextResponse.json(
         { success: false, error: 'Please provide a valid customer name (minimum 2 characters).' },
         { status: 400 }
       );
     }
 
-    if (!customerPhone || typeof customerPhone !== 'string' || customerPhone.trim().length < 8) {
+    if (cleanCustomerPhone.length < 8) {
       return NextResponse.json(
         { success: false, error: 'Please provide a valid contact phone number.' },
         { status: 400 }
       );
     }
 
-    if (!deliveryAddress || typeof deliveryAddress !== 'string' || deliveryAddress.trim().length < 5) {
+    if (cleanDeliveryAddress.length < 5) {
       return NextResponse.json(
         { success: false, error: 'Please provide a complete delivery address.' },
         { status: 400 }
@@ -163,18 +170,18 @@ export async function POST(req: NextRequest) {
     // 5. Store in Database
     const newOrder = await db.createOrder({
       orderNumber,
-      customerName: customerName.trim(),
-      customerPhone: customerPhone.trim(),
-      customerEmail: customerEmail ? String(customerEmail).trim() : null,
-      deliveryAddress: deliveryAddress.trim(),
-      deliveryNotes: deliveryNotes ? String(deliveryNotes).trim() : null,
+      customerName: cleanCustomerName,
+      customerPhone: cleanCustomerPhone,
+      customerEmail: cleanCustomerEmail || null,
+      deliveryAddress: cleanDeliveryAddress,
+      deliveryNotes: cleanDeliveryNotes || null,
       paymentMethod,
       paymentStatus: initialPaymentStatus,
       orderStatus: initialOrderStatus,
       subtotal: calculatedSubtotal,
       deliveryFee: calculatedDeliveryFee,
       total: calculatedTotal,
-      transactionReference: transactionReference ? String(transactionReference).trim() : null,
+      transactionReference: cleanTransactionReference || null,
       items: verifiedOrderItems,
     });
 

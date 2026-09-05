@@ -9,6 +9,15 @@ export function formatCurrency(amount: number): string {
   return `Rs. ${Math.round(amount).toLocaleString('en-PK')}`;
 }
 
+export function sanitizeCustomerInput(value: unknown, maxLength = 1000): string {
+  if (typeof value !== 'string') return '';
+  return value
+    .replace(/<[^>]*>/g, '')
+    .replace(/[\u0000-\u001F\u007F]/g, '')
+    .trim()
+    .slice(0, maxLength);
+}
+
 export function generateOrderNumber(): string {
   const timestamp = Date.now().toString(36).toUpperCase().slice(-4);
   const random = Math.floor(1000 + Math.random() * 9000);

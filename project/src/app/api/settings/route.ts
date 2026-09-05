@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     const settings = await db.getSettings();
@@ -9,11 +12,7 @@ export async function GET() {
         success: true,
         settings,
       },
-      {
-        headers: {
-          'Cache-Control': 'public, max-age=60, s-maxage=60, stale-while-revalidate=300',
-        },
-      }
+      { headers: { 'Cache-Control': 'no-store, max-age=0' } }
     );
   } catch (error) {
     console.error('Error fetching settings:', error);

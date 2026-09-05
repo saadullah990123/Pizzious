@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import { PaymentMethod, StoreSettings } from '@/lib/types';
-import { formatCurrency, getWhatsAppUrl } from '@/lib/utils';
+import { formatCurrency, getWhatsAppUrl, sanitizeCustomerInput } from '@/lib/utils';
 import {
   X,
   CreditCard,
@@ -25,6 +25,31 @@ interface CheckoutModalProps {
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({ settings }) => {
   const { items, subtotal, isCheckoutOpen, setIsCheckoutOpen, clearCart } = useCart();
+  const [liveSettings, setLiveSettings] = useState<StoreSettings | null>(settings || null);
+  const [isLoadingSettings, setIsLoadingSettings] = useState(false);
+
+  useEffect(() => {
+    if (!isCheckoutOpen) return;
+
+    let cancelled = false;
+    setIsLoadingSettings(true);
+    fetch('/api/settings', { cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Failed to load payment settings');
+        return response.json();
+      })
+      .then((data) => {
+        if (!cancelled && data.settings) setLiveSettings(data.settings);
+      })
+      .catch((error) => console.error('Checkout settings error:', error))
+      .finally(() => {
+        if (!cancelled) setIsLoadingSettings(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isCheckoutOpen]);
 
   // Form states
   const [customerName, setCustomerName] = useState('');
@@ -41,10 +66,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ settings }) => {
   const [completedOrder, setCompletedOrder] = useState<any | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
+  const currentSettings = liveSettings || settings;
+
   if (!isCheckoutOpen) return null;
 
-  const freeDeliveryThreshold = settings?.freeDeliveryThreshold || 2500;
-  const standardDeliveryFee = settings?.deliveryFee || 150;
+  const freeDeliveryThreshold = currentSettings?.freeDeliveryThreshold || 2500;
+  const standardDeliveryFee = currentSettings?.deliveryFee || 150;
   const isFreeDelivery = subtotal >= freeDeliveryThreshold;
   const deliveryFee = isFreeDelivery ? 0 : standardDeliveryFee;
   const total = subtotal + deliveryFee;
@@ -84,13 +111,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ settings }) => {
       setIsSubmitting(true);
 
       const orderPayload = {
-        customerName,
-        customerPhone,
-        customerEmail: customerEmail || null,
-        deliveryAddress,
-        deliveryNotes: deliveryNotes || null,
+        customerName: sanitizeCustomerInput(customerName, 100),
+        customerPhone: sanitizeCustomerInput(customerPhone, 30),
+        customerEmail: sanitizeCustomerInput(customerEmail, 254) || null,
+        deliveryAddress: sanitizeCustomerInput(deliveryAddress, 1000),
+        deliveryNotes: sanitizeCustomerInput(deliveryNotes, 500) || null,
         paymentMethod,
-        transactionReference: transactionReference || null,
+        transactionReference: sanitizeCustomerInput(transactionReference, 200) || null,
         items: items.map((i) => ({
           menuItemId: i.menuItem.id,
           quantity: i.quantity,
@@ -128,7 +155,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ settings }) => {
   // WhatsApp follow-up link for completed order
   const orderWhatsAppUrl = completedOrder
     ? getWhatsAppUrl(
-        settings?.whatsappNumber || '+923251020222',
+        currentSettings?.whatsappNumber || '',
         `Hi Pizzious! I placed order #${completedOrder.orderNumber} for ${formatCurrency(completedOrder.total)}. Name: ${completedOrder.customerName}. Payment Method: ${completedOrder.paymentMethod}. ${completedOrder.transactionReference ? `Transaction Ref: ${completedOrder.transactionReference}` : ''}`
       )
     : '';
@@ -269,7 +296,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ settings }) => {
                       required
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
-                      placeholder="e.g. 03001234567"
+                      placeholder="e.g. 03xxxxxxxxx"
                       className="w-full bg-neutral-50 border border-neutral-300 rounded-xl px-3.5 py-2.5 text-neutral-900 text-sm focus:outline-none focus:border-brand-flame focus:bg-white transition-colors font-medium"
                     />
                   </div>
@@ -433,24 +460,28 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ settings }) => {
                       Transfer instructions for {paymentMethod}:
                     </p>
 
+                    {isLoadingSettings && (
+                      <p className="text-xs text-neutral-500">Loading current payment details...</p>
+                    )}
+
                     {paymentMethod === 'EASYPAISA' && (
                       <div className="space-y-2 text-xs">
                         <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-neutral-200">
                           <div>
                             <span className="text-neutral-500 block text-[11px]">Account Title:</span>
-                            <span className="text-neutral-900 font-bold">{settings?.easyPaisaTitle || 'Pizzious Official'}</span>
+                            <span className="text-neutral-900 font-bold">{currentSettings?.easyPaisaTitle || 'Not configured'}</span>
                           </div>
                         </div>
                         <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-neutral-200">
                           <div>
                             <span className="text-neutral-500 block text-[11px]">EasyPaisa Number:</span>
                             <span className="text-brand-flame font-mono font-black text-sm">
-                              {settings?.easyPaisaNumber || '03001234567'}
+                              {currentSettings?.easyPaisaNumber || 'Not configured'}
                             </span>
                           </div>
                           <button
                             type="button"
-                            onClick={() => handleCopy(settings?.easyPaisaNumber || '03001234567', 'ep')}
+                            onClick={() => handleCopy(currentSettings?.easyPaisaNumber || '', 'ep')}
                             className="flex items-center gap-1 bg-neutral-900 hover:bg-neutral-800 text-white text-xs px-2.5 py-1.5 rounded-lg transition-colors font-bold"
                           >
                             {copiedKey === 'ep' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -465,19 +496,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ settings }) => {
                         <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-neutral-200">
                           <div>
                             <span className="text-neutral-500 block text-[11px]">Account Title:</span>
-                            <span className="text-neutral-900 font-bold">{settings?.jazzCashTitle || 'Pizzious Official Wallet'}</span>
+                            <span className="text-neutral-900 font-bold">{currentSettings?.jazzCashTitle || 'Not configured'}</span>
                           </div>
                         </div>
                         <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-neutral-200">
                           <div>
                             <span className="text-neutral-500 block text-[11px]">JazzCash Number:</span>
                             <span className="text-brand-flame font-mono font-black text-sm">
-                              {settings?.jazzCashNumber || '03001234567'}
+                              {currentSettings?.jazzCashNumber || 'Not configured'}
                             </span>
                           </div>
                           <button
                             type="button"
-                            onClick={() => handleCopy(settings?.jazzCashNumber || '03001234567', 'jc')}
+                            onClick={() => handleCopy(currentSettings?.jazzCashNumber || '', 'jc')}
                             className="flex items-center gap-1 bg-neutral-900 hover:bg-neutral-800 text-white text-xs px-2.5 py-1.5 rounded-lg transition-colors font-bold"
                           >
                             {copiedKey === 'jc' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -491,23 +522,29 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ settings }) => {
                       <div className="space-y-2 text-xs">
                         <div className="bg-white p-2.5 rounded-xl border border-neutral-200">
                           <span className="text-neutral-500 block text-[11px]">Account Title:</span>
-                          <span className="text-neutral-900 font-bold">{settings?.meezanTitle || 'Pizzious Fast Food'}</span>
+                          <span className="text-neutral-900 font-bold">{currentSettings?.meezanTitle || 'Not configured'}</span>
                         </div>
                         <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-neutral-200">
                           <div>
                             <span className="text-neutral-500 block text-[11px]">Meezan IBAN:</span>
                             <span className="text-brand-flame font-mono font-bold text-xs">
-                              {settings?.meezanIban || 'PK42MEZN0001234567890123'}
+                              {currentSettings?.meezanIban || 'Not configured'}
                             </span>
                           </div>
                           <button
                             type="button"
-                            onClick={() => handleCopy(settings?.meezanIban || 'PK42MEZN0001234567890123', 'meezan')}
+                            onClick={() => handleCopy(currentSettings?.meezanIban || '', 'meezan')}
                             className="flex items-center gap-1 bg-neutral-900 hover:bg-neutral-800 text-white text-xs px-2.5 py-1.5 rounded-lg transition-colors font-bold"
                           >
                             {copiedKey === 'meezan' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                             <span>{copiedKey === 'meezan' ? 'Copied' : 'Copy'}</span>
                           </button>
+                        </div>
+                        <div className="bg-white p-2.5 rounded-xl border border-neutral-200">
+                          <span className="text-neutral-500 block text-[11px]">Account Number:</span>
+                          <span className="text-neutral-900 font-mono font-bold text-xs">
+                            {currentSettings?.meezanAccount || 'Not configured'}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -516,18 +553,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ settings }) => {
                       <div className="space-y-2 text-xs">
                         <div className="bg-white p-2.5 rounded-xl border border-neutral-200">
                           <span className="text-neutral-500 block text-[11px]">Account Title:</span>
-                          <span className="text-neutral-900 font-bold">{settings?.sadaPayTitle || 'Pizzious'}</span>
+                          <span className="text-neutral-900 font-bold">{currentSettings?.sadaPayTitle || 'Not configured'}</span>
                         </div>
                         <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-neutral-200">
                           <div>
                             <span className="text-neutral-500 block text-[11px]">SadaPay Number:</span>
                             <span className="text-brand-flame font-mono font-black text-sm">
-                              {settings?.sadaPayNumber || '03001234567'}
+                              {currentSettings?.sadaPayNumber || 'Not configured'}
                             </span>
                           </div>
                           <button
                             type="button"
-                            onClick={() => handleCopy(settings?.sadaPayNumber || '03001234567', 'sada')}
+                            onClick={() => handleCopy(currentSettings?.sadaPayNumber || '', 'sada')}
                             className="flex items-center gap-1 bg-neutral-900 hover:bg-neutral-800 text-white text-xs px-2.5 py-1.5 rounded-lg transition-colors font-bold"
                           >
                             {copiedKey === 'sada' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -543,12 +580,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ settings }) => {
                           <div>
                             <span className="text-neutral-500 block text-[11px]">PayPal Email:</span>
                             <span className="text-brand-flame font-mono font-bold text-xs">
-                              {settings?.payPalEmail || 'payments@pizzious.com'}
+                              {currentSettings?.payPalEmail || 'Not configured'}
                             </span>
                           </div>
                           <button
                             type="button"
-                            onClick={() => handleCopy(settings?.payPalEmail || 'payments@pizzious.com', 'pp')}
+                            onClick={() => handleCopy(currentSettings?.payPalEmail || '', 'pp')}
                             className="flex items-center gap-1 bg-neutral-900 hover:bg-neutral-800 text-white text-xs px-2.5 py-1.5 rounded-lg transition-colors font-bold"
                           >
                             {copiedKey === 'pp' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -556,9 +593,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ settings }) => {
                           </button>
                         </div>
                         <p className="text-[11px] text-neutral-500">
-                          {settings?.payPalInstructions || 'Send transfer to payments@pizzious.com and enter your Transaction ID below.'}
+                          {currentSettings?.payPalInstructions || 'No payment instructions configured.'}
                         </p>
                       </div>
+                    )}
+
+                    {paymentMethod !== 'PAYPAL' && currentSettings?.manualPaymentInstructions && (
+                      <p className="text-[11px] text-neutral-500">{currentSettings.manualPaymentInstructions}</p>
                     )}
 
                     <div>
